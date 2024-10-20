@@ -1,13 +1,19 @@
 <?php
-
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class teacher extends Model
+class Teacher extends Model
 {
-    public function teacher()
+    use HasFactory;
+
+    protected $fillable = ['teacher_name'];
+
+    public function students()
     {
-        return $this->belongsTo(teacher::class, 'class_teacher_id');
+        return $this->hasMany(Student::class, 'class_teacher_id');
     }
+
+    
 }

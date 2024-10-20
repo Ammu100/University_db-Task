@@ -2,74 +2,74 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Models\Student;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
-
-use App\Models\student;
-
-use Exception;
-
+use Illuminate\Support\Facades\Log;
+use Yajra\DataTables\DataTables;
 
 class StudentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request)
+    public function index()
     {
-        $students = student::with('teacher')->paginate(10);
-        return response()->json($students);
+        $teachers = Teacher::all();
+        return view('students.index', compact('teachers'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-         $validated = $request->validate([
+        Log::info('Storing new student:', $request->all());
+        $validatedData = $request->validate([
             'student_name' => 'required',
-            'class_teacher_id' => 'required',
+            'class_teacher_id' => 'required|exists:teachers,id',
             'class' => 'required',
             'admission_date' => 'required|date',
-            'yearly_fees' => 'required|numeric',
+            'yearly_fees' => 'required|numeric|min:0',
         ]);
-    
-        student::create($validated);
-        return response()->json(['message' => 'Student added successfully!']);
+
+        Student::create($validatedData);
+
+        return response()->json(['success' => 'Student added successfully']);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function edit($id)
     {
-        //
+        $student = Student::find($id);
+        $teachers = Teacher::all();
+
+        return response()->json([
+            'student' => $student,
+            'teachers' => $teachers
+        ]);
     }
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+
+    public function update(Request $request, $id)
     {
-        $validated = $request->validate([
+        $request->validate([
             'student_name' => 'required',
-            'class_teacher_id' => 'required',
+            'class_teacher_id' => 'required|exists:teachers,id',
             'class' => 'required',
             'admission_date' => 'required|date',
-            'yearly_fees' => 'required|numeric',
+            'yearly_fees' => 'required|numeric|min:0',
         ]);
-    
-        $student = student::findOrFail($id);
-        $student->update($validated);
-        return response()->json(['message' => 'Student updated successfully!']);
+
+        $student = Student::find($id);
+        $student->update($request->all());
+
+        return response()->json(['success' => 'Student updated successfully']);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        $student = student::findOrFail($id);
+        $student = Student::find($id);
         $student->delete();
-        return response()->json(['message' => 'Student deleted successfully!']);
+
+        return response()->json(['success' => 'Student deleted successfully']);
+    }
+
+    public function fetchStudents()
+    {
+        $students = Student::with('teacher')->get();
+        return DataTables::of($students)->make(true);
     }
 }

@@ -1,13 +1,25 @@
 <?php
-
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class student extends Model
+
+
+class Student extends Model
 {
-    public function students()
-{
-    return $this->hasMany(student::class, 'class_teacher_id');
+    protected $fillable = [
+        'student_name',
+        'class_teacher_id',
+        'class',
+        'admission_date',
+        'yearly_fees',
+    ];
+
+    public function teacher()
+    {
+        return $this->belongsTo(Teacher::class, 'class_teacher_id');
+    }
 }
-}
+

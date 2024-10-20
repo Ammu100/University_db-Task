@@ -1,68 +1,79 @@
 <?php
-
 namespace App\Http\Controllers;
-use App\Models\teacher;
-use App\Http\Controllers\Controller;
+
+use App\Models\Teacher;
 use Illuminate\Http\Request;
 
 class TeacherController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the teachers.
      */
     public function index()
     {
-        $teachers = teacher::all();
-        return response()->json($teachers);
+        $teachers = Teacher::all();
+        return view('teachers.index', compact('teachers'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Show the form for creating a new teacher.
+     */
+    public function create()
+    {
+        return view('teachers.create');
+    }
+
+    /**
+     * Store a newly created teacher in storage.
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'teacher_name' => 'required|string',
+        $request->validate([
+            'teacher_name' => 'required|string|max:255',
         ]);
 
-        Teacher::create($validated);
-        return response()->json(['message' => 'Teacher created successfully'], 201);
+        Teacher::create($request->all());
+
+        return redirect()->route('teachers.index')->with('success', 'Teacher created successfully');
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified teacher.
      */
-    public function show(string $id)
+    public function show(Teacher $teacher)
     {
-        //
+        return view('teachers.show', compact('teacher'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Show the form for editing the specified teacher.
      */
-    public function update(Request $request, string $id)
+    public function edit(Teacher $teacher)
     {
-        $validated = $request->validate([
-            'id' => 'required|exists:teachers,id',
-            'teacher_name' => 'required|string',
-        ]);
-
-        $teacher = teacher::find($validated['id']);
-        $teacher->update($validated);
-        return response()->json(['message' => 'Teacher updated successfully']);
+        return view('teachers.edit', compact('teacher'));
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Update the specified teacher in storage.
      */
-    public function destroy(string $id)
+    public function update(Request $request, Teacher $teacher)
     {
-        $validated = $request->validate([
-            'id' => 'required|exists:teachers,id',
+        $request->validate([
+            'teacher_name' => 'required|string|max:255',
         ]);
 
-        $teacher = teacher::find($validated['id']);
+        $teacher->update($request->all());
+
+        return redirect()->route('teachers.index')->with('success', 'Teacher updated successfully');
+    }
+
+    /**
+     * Remove the specified teacher from storage.
+     */
+    public function destroy(Teacher $teacher)
+    {
         $teacher->delete();
-        return response()->json(['message' => 'Teacher deleted successfully']);
+
+        return redirect()->route('teachers.index')->with('success', 'Teacher deleted successfully');
     }
 }

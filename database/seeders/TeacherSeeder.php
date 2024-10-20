@@ -1,23 +1,21 @@
 <?php
 
 namespace Database\Seeders;
-use Illuminate\Support\Facades\DB;
 
+use App\Models\Teacher;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-
 
 class TeacherSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     *
+     * @return void
      */
     public function run()
-{
-    DB::table('teachers')->insert([
-        ['teacher_name' => 'Mr. Smith'],
-        ['teacher_name' => 'Ms. Johnson'],
-        ['teacher_name' => 'Mrs. Brown'],
-    ]);
-}
+    {
+        Teacher::create(['id' => 1, 'teacher_name' => 'Mr. Smith']);
+    }
 }
